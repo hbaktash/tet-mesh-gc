@@ -1,0 +1,7 @@
+[submodule "deps/geometry-central"]
+	path = deps/geometry-central
+	url = git@github.com:hbaktash/geometry-central.git
+	branch = tet-mesh
+[submodule "deps/polyscope"]
+	path = deps/polyscope
+	url = git@github.com:nmwsharp/polyscope.git
