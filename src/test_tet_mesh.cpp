@@ -1,8 +1,8 @@
 // Normal curvers
 
-#include "geometrycentral/surface/manifold_surface_mesh.h"
-#include "geometrycentral/surface/meshio.h"
-#include "geometrycentral/surface/vertex_position_geometry.h"
+#include "geometrycentral/volume/manifold_surface_mesh.h"
+#include "geometrycentral/volume/meshio.h"
+#include "geometrycentral/volume/vertex_position_geometry.h"
 
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
@@ -16,7 +16,7 @@
 #include "colormap.h"
 
 using namespace geometrycentral;
-using namespace geometrycentral::surface;
+using namespace geometrycentral::volume;
 
 // == Geometry-central data
 std::unique_ptr<TetMesh> tet_mesh_uptr;
@@ -37,7 +37,7 @@ polyscope::SurfaceMesh* psMesh;
 polyscope::VolumeMesh* psTetMesh;
 std::string MESHNAME;
 
-EdgeData<int> edge_ints;
+volume::EdgeData<int> edge_ints;
 
 // Some global variables
 Vector<double> DELTA;                      // sources
@@ -62,10 +62,10 @@ void draw_normal_surfaces(){
 * one integer per edge
 */
 void assign_edge_ints(){
-    edge_ints = EdgeData<int>(*tet_mesh, 0);
+    edge_ints = volume::EdgeData<int>(*tet_mesh, 0);
 
     // int c0=0, c1=0, c2=0, c3=0;
-    Vertex  v0 = tet_mesh->vertex(0),
+    volume::Vertex  v0 = tet_mesh->vertex(0),
             v1 = tet_mesh->vertex(1),
             v2 = tet_mesh->vertex(2),
             v3 = tet_mesh->vertex(3),

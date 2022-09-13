@@ -1,15 +1,20 @@
 #pragma once
 
-#include "geometrycentral/surface/simple_polygon_mesh.h"
-#include "geometrycentral/surface/surface_mesh.h"
+#include "geometrycentral/volume/simple_polygon_mesh.h"
+#include "geometrycentral/volume/surface_mesh.h"
 
 
-using namespace geometrycentral;
-using namespace geometrycentral::surface;
+namespace geometrycentral{
+namespace volume{
+// using namespace geometrycentral::surface::volume;
+
+template <typename T>
+using TetData = MeshData<Tet, T>;
 
 class SimpleTetMesh : public SimplePolygonMesh{
 public:
     std::vector<std::vector<size_t>> tets;
+    std::vector<Tet> tet_objects;
     
     SimpleTetMesh(const std::vector<std::vector<size_t>>& tets_,
                   const std::vector<Vector3>& vertexCoordinates_)
@@ -17,9 +22,16 @@ public:
     
     ~SimpleTetMesh(){}
 
-    // ungarbage functions
+
+    //counters
+    size_t nTetsCapacityCount = 0;
+    size_t nTetsFillCount = 0;
+    
+    //generators
+    Tet getNewTet();
+    // merging functions
     void mergeIdenticalVertices(); // overriding parent function; just changing some minor stuff.
-    void mergeIdenticalFaces(); // overriding parent function; just changing some minor stuff.
+    void mergeIdenticalFaces(); // merging faces with the same set of vertices (by index).
     
 
     // helper functions
@@ -40,7 +52,8 @@ public:
     std::vector<size_t> tet_neighs_of_edge(Edge e);
 };
 
-
+}
+}
 
 // //hash function
 // struct hashFunction 

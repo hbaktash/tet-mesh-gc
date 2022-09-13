@@ -1,6 +1,12 @@
 #include "tet_mesh.h"
 // #include "set"
 
+namespace geometrycentral{
+namespace volume{
+
+SimpleTetMesh::SimpleTetMesh(const std::vector<std::vector<size_t>>& tets_, const std::vector<Vector3>& vertexCoordinates_)
+    :SimplePolygonMesh(triangles_from_tets(tets_), vertexCoordinates_), tets(tets_){}
+
 void SimpleTetMesh::mergeIdenticalVertices(){
   std::vector<Vector3> compressedPositions;
   // Store mapping from original vertex index to merged vertex index
@@ -63,7 +69,7 @@ void SimpleTetMesh::mergeIdenticalFaces(){
 }
 
 // helper fucntions 
-std::vector<std::vector<size_t>> SimpleTetMesh::triangles_from_tets(std::vector<std::vector<size_t>> tets_){
+std::vector<std::vector<size_t>> triangles_from_tets(std::vector<std::vector<size_t>> tets_){
     // just adding tet faces. Will compress later
     int face_cnt = 0;
     std::vector<std::vector<size_t>> triangles;
@@ -96,4 +102,7 @@ std::vector<size_t> TetMesh::tet_neighs_of_edge(Edge e){
        std::find(tet.begin(), tet.end(), v2.getIndex()) != tet.end()) neigh_tets.push_back(tet_ind);
   }
   return neigh_tets;
+}
+
+}
 }
