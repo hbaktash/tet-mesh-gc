@@ -8,17 +8,20 @@ namespace geometrycentral{
 namespace volume{
 // using namespace geometrycentral::surface::volume;
 
+//container template
 template <typename T>
 using TetData = MeshData<Tet, T>;
 
+// helper functions
+std::vector<std::vector<size_t>> triangles_from_tets(std::vector<std::vector<size_t>> tets);
+
+// classes
 class SimpleTetMesh : public SimplePolygonMesh{
 public:
     std::vector<std::vector<size_t>> tets;
-    std::vector<Tet> tet_objects;
     
     SimpleTetMesh(const std::vector<std::vector<size_t>>& tets_,
-                  const std::vector<Vector3>& vertexCoordinates_)
-                  :SimplePolygonMesh(triangles_from_tets(tets_), vertexCoordinates_), tets(tets_){}
+                  const std::vector<Vector3>& vertexCoordinates_);
     
     ~SimpleTetMesh(){}
 
@@ -34,22 +37,32 @@ public:
     void mergeIdenticalFaces(); // merging faces with the same set of vertices (by index).
     
 
-    // helper functions
-    std::vector<std::vector<size_t>> triangles_from_tets(std::vector<std::vector<size_t>> tets);
 };
 
 class TetMesh : public SurfaceMesh{
 public:
     std::vector<std::vector<size_t>> tets;
-    
+    std::vector<Tet> tet_objects;
+
+
+    TetMesh(const std::vector<std::vector<size_t>>& tets_)
+            :TetMesh(tets_, triangles_from_tets(tets_)){}
+            
     TetMesh(const std::vector<std::vector<size_t>>& tets_,
-            const std::vector<std::vector<size_t>>& triangles_)
-            :SurfaceMesh(triangles_), tets(tets_){}
+            const std::vector<std::vector<size_t>>& triangles_); // assuming there are no identical triangles or vertices
     
     ~TetMesh(){}
 
-    // can have cleaner/faster navigators later.
-    std::vector<size_t> tet_neighs_of_edge(Edge e);
+    // navigation helpers
+    Face get_connecting_face(Vertex v1, Vertex v2, Vertex v3); // assumes we dont have non-manifold(?!) or intrinsic(!?) or.. faces in the 3-manifold; generally we should return a vector<Face>.
+    Tet get_connecting_tet(Vertex v1, Vertex v2, Vertex v3, Vertex v4); // assumes we dont have duplicate(?!) tets..; otherwise ..//..
+    
+    // element counters
+    size_t nTets() const;
+    size_t nTetsCapacity() const;
+    TetSet tets();
+protected:
+    
 };
 
 }
