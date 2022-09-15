@@ -54,31 +54,23 @@ public:
     ~TetMesh(){}
 
     // navigation helpers
-    Face get_connecting_face(Vertex v1, Vertex v2, Vertex v3); // assumes we dont have non-manifold(?!) or intrinsic(!?) or.. faces in the 3-manifold; generally we should return a vector<Face>.
-    Tet get_connecting_tet(Vertex v1, Vertex v2, Vertex v3, Vertex v4); // assumes we dont have duplicate(?!) tets..; otherwise ..//..
+    Face get_connecting_face(Vertex v1, Vertex v2, Vertex v3); // assuming we dont have non-manifold(?!) edges or duplicat(!?) or.. faces (3-manifold) ; generally we should return a vector<Face>.
+    Tet get_connecting_tet(Vertex v1, Vertex v2, Vertex v3, Vertex v4); // assuming we dont have duplicate(?!) tets..; otherwise ..//..
     
-    // element counters
+    // Range-based loops
+    TetSet tets();
+
+    // element counters getters
     size_t nTets() const;
     size_t nTetsCapacity() const;
-    TetSet tets();
+
 protected:
-    
+    // element counters
+    size_t nTetsCount = 0;
+    size_t nTetsCapacityCount = 0;
 };
 
 }
 }
 
-// //hash function
-// struct hashFunction 
-// {
-//   size_t operator()(const std::array<size_t, 3> &myArray) const {
-//     std::hash<size_t> hasher;
-//     size_t answer = 0;
-      
-//     for (size_t i : myArray) {
-//       answer ^= hasher(i) + 0x9e3779b9 + 
-//                 (answer << 6) + (answer >> 2);
-//     }
-//     return answer;
-//   }
-// };
+#include <tet_mesh.ipp>
