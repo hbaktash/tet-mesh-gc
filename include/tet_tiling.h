@@ -3,7 +3,7 @@
 #include "geometrycentral/volume/simple_polygon_mesh.h"
 #include "geometrycentral/volume/surface_mesh.h"
 #include "geometrycentral/volume/vertex_position_geometry.h"
-#include "tet_mesh.h"
+#include "geometrycentral/volume/tet_mesh.h"
 
 using namespace geometrycentral;
 using namespace geometrycentral::volume;

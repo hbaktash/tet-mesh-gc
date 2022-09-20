@@ -3,12 +3,12 @@
 #include "geometrycentral/volume/manifold_surface_mesh.h"
 #include "geometrycentral/volume/meshio.h"
 #include "geometrycentral/volume/vertex_position_geometry.h"
+#include "geometrycentral/volume/tet_mesh.h"
 
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
 #include "polyscope/volume_mesh.h"
 
-#include "tet_mesh.h"
 #include "tet_tiling.h"
 
 #include "imgui.h"
@@ -49,44 +49,6 @@ polyscope::SurfaceGraphQuantity* normal_curves;
 double selected_edge_radius;
 double normal_curves_graph_radius;
 
-
-/*
-* Display normal curves with uniform vertex placement.
-*/
-void draw_normal_surfaces(){
-    
-}
-
-/* 
-* finding edge values
-* one integer per edge
-*/
-void assign_edge_ints(){
-    edge_ints = volume::EdgeData<int>(*tet_mesh, 0);
-
-    // int c0=0, c1=0, c2=0, c3=0;
-    volume::Vertex  v0 = tet_mesh->vertex(0),
-            v1 = tet_mesh->vertex(1),
-            v2 = tet_mesh->vertex(2),
-            v3 = tet_mesh->vertex(3),
-            v4 = tet_mesh->vertex(4);
-    int c0=0, c1=0, c2=0, c3=0;
-    int d01 = 0, d02 = 1, d03 = 1;
-    edge_ints[tet_mesh->connectingEdge(v0, v2)] = c0 + c2 + d01 + d03; // (0,2)
-    edge_ints[tet_mesh->connectingEdge(v0, v1)] = c0 + c1 + d02 + d03; // (0,1)
-    edge_ints[tet_mesh->connectingEdge(v1, v2)] = c1 + c2 + d01 + d02; // (1,2)
-    edge_ints[tet_mesh->connectingEdge(v0, v3)] = c0 + c3 + d01 + d02; // (0,3)
-    edge_ints[tet_mesh->connectingEdge(v2, v3)] = c3 + c2 + d02 + d03; // (2,3)
-    edge_ints[tet_mesh->connectingEdge(v1, v3)] = c1 + c3 + d01 + d03; // (1,3)
-
-    //after double
-    int C4 = 0;    
-    edge_ints[tet_mesh->connectingEdge(v4, v1)] = C4 + 1; 
-    edge_ints[tet_mesh->connectingEdge(v4, v2)] = C4 + 2; 
-    edge_ints[tet_mesh->connectingEdge(v4, v3)] = C4 + 0;
-    //after edge-flip
-    // edge_ints[tet_mesh->connectingEdge(v4, v0)] = 2; 
-}
 
 /*
  * Show selected edge.
@@ -167,12 +129,7 @@ int main(int argc, char** argv) {
                                             polyscopePermutations(*tet_mesh));
 
     // psTetMesh = polyscope::registerTetMesh("tet mesh", geometry->inputVertexPositions, tet_mesh->tets);
-    
-    // Initalize
-    assign_edge_ints();
-    surface_edge_ints = psMesh->addEdgeScalarQuantity("cut count", edge_ints, 
-                                  polyscope::DataType::MAGNITUDE);
-    psMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
+    //     psMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
 
     // Give control to the polyscope gui
     polyscope::show();

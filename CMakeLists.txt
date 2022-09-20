@@ -68,7 +68,6 @@ add_subdirectory(deps/polyscope deps/polyscope)
 
 set(SRCS_TEST_TET_MESH
   src/test_tet_mesh.cpp
-  src/tet_mesh.cpp
   src/tet_tiling.cpp
   utils/src/colormap.cpp
 )
