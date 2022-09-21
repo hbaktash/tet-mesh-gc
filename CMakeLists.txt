@@ -76,5 +76,5 @@ set(SRCS_TEST_TET_MESH
 add_executable(test_tet_mesh  "${SRCS_TEST_TET_MESH}")
 target_include_directories(test_tet_mesh PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 target_include_directories(test_tet_mesh PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/utils/include")
-target_include_directories(test_tet_mesh PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/polyscope/deps/args")
+target_include_directories(test_tet_mesh PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/deps/polyscope/deps/args")
 target_link_libraries(test_tet_mesh geometry-central polyscope)

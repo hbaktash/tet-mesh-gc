@@ -8,6 +8,7 @@
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
 #include "polyscope/volume_mesh.h"
+#include "args/args.hxx"
 
 #include "tet_tiling.h"
 
@@ -37,7 +38,6 @@ polyscope::SurfaceMesh* psMesh;
 polyscope::VolumeMesh* psTetMesh;
 std::string MESHNAME;
 
-volume::EdgeData<int> edge_ints;
 
 // Some global variables
 Vector<double> DELTA;                      // sources
@@ -66,13 +66,39 @@ void functionCallback() {
     if (ImGui::Button("some info")) {
         polyscope::warning(" nEdges: " + std::to_string(tet_mesh->nEdges()) + 
                            " nVertices: " + std::to_string(tet_mesh->nVertices()), 
-                           " nFaces: " + std::to_string(tet_mesh->nFaces()));
+                           " nFaces: " + std::to_string(tet_mesh->nFaces()) + 
+                           " nTets: " + std::to_string(tet_mesh->nTets()));
     }
 }
 
 
 int main(int argc, char** argv) {
     
+    // Configure the argument parser
+    
+    // Configure the argument parser
+    // args::ArgumentParser parser("tet mesh test");
+    // args::Positional<std::string> v1_parser(parser, "1", "vertex1 ");
+    // args::Positional<std::string> v2_parser(parser, "2", "vertex2 ");
+
+    // // Parse args
+    // try {
+    //     parser.ParseCLI(argc, argv);
+    // } catch (args::Help) {
+    //     std::cout << parser;
+    //     return 0;
+    // } catch (args::ParseError e) {
+    //     std::cerr << e.what() << std::endl;
+    //     std::cerr << parser;
+    //     return 1;
+    // }
+
+    // // If a mesh name was not given, use default mesh.
+    // std::string v1_str = "1", v2_str = "2";
+    // if (v1_parser) v1_str = args::get(v1_parser);
+    // if (v2_parser) v2_str = args::get(v2_parser);
+    // size_t v1_ind = std::stoi(v1_str), v2_ind = std::stoi(v2_str);
+
     //for this test I will manually make a few tets.
     std::vector<Vector3> positions;
     std::vector<std::vector<size_t>> tets;
@@ -90,11 +116,13 @@ int main(int argc, char** argv) {
         {0. ,  0.,  0.},
         {0.5, 1.,  0.},
         {1. ,  0.,  0.},
-        {0.5, 0.5,-1.} // down
+        {0.5, 0.5,-1.}, // down
+        {1.0, 1.0, 1.} 
     };
     tets = {
         {0, 1, 2, 3},
-        {1, 2, 3, 4}
+        {1, 2, 3, 4},
+        {0, 2, 3, 5}
     };
     // positions = { // double after delauny
     //     {0.5, 0.5, 1.}, // up
@@ -121,18 +149,39 @@ int main(int argc, char** argv) {
     polyscope::init();
 
     // Set the callback function
-    polyscope::state::userCallback = functionCallback;
-
+    // polyscope::state::userCallback = functionCallback;
+    
     // geometry->normalize(Vector3::constant(0.), true);
     // Add mesh to GUI
-    psMesh = polyscope::registerSurfaceMesh("dummy tet", geometry->inputVertexPositions, tet_mesh->getFaceVertexList(),
-                                            polyscopePermutations(*tet_mesh));
+    // psMesh = polyscope::registerSurfaceMesh("dummy tet", geometry->inputVertexPositions, tet_mesh->getFaceVertexList(),
+    //                                         polyscopePermutations(*tet_mesh));
+    
+    // psTetMesh = polyscope::registerTetMesh("tet mesh", geometry->inputVertexPositions, tet_mesh->tet_v_inds);
+    std::cout<<"tets count " << tet_mesh->tet_objects.size() << std::endl;
+    // psMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
+    std::string v1_str = "1", v2_str = "2";
+    while (true){
+        std::cin>> v1_str >> v2_str;
+        if(v1_str == "f") break;
+        size_t v1_ind = std::stoi(v1_str), v2_ind = std::stoi(v2_str);
+        Vertex v1 = tet_mesh->vertex(v1_ind), v2 = tet_mesh->vertex(v2_ind);
+        Edge e = tet_mesh->connectingEdge(v1, v2);
+        if (e.getIndex() != geometrycentral::INVALID_IND){
+            std::cout<<"\n connecting e for "<<v1<<" "<<v2<<" is "<< e << "\n";
+            std::vector<Tet> neigh_tets = e.adjTets;
+            std::cout<<"and adj for "<< v1<<": "<< v1.adjTets.size() <<" .and for "<< v2 <<": "<< v2.adjTets.size() << "\n";
+            
+            std::cout<<"and adj tets for e: " << e.adjTets.size() << "\n";
+            for (Tet t:neigh_tets){
+                std::cout<<t.getIndex()<<" ";
+            }
+            std::cout<<std::endl;
+        }
 
-    // psTetMesh = polyscope::registerTetMesh("tet mesh", geometry->inputVertexPositions, tet_mesh->tets);
-    //     psMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
-
+    }
+    
     // Give control to the polyscope gui
-    polyscope::show();
+    // polyscope::show();
 
     delete tet_mesh;
     delete geometry;
