@@ -168,14 +168,27 @@ int main(int argc, char** argv) {
         Edge e = tet_mesh->connectingEdge(v1, v2);
         if (e.getIndex() != geometrycentral::INVALID_IND){
             std::cout<<"\n connecting e for "<<v1<<" "<<v2<<" is "<< e << "\n";
-            std::vector<Tet> neigh_tets = e.adjTets;
-            std::cout<<"and adj for "<< v1<<": "<< v1.adjTets.size() <<" .and for "<< v2 <<": "<< v2.adjTets.size() << "\n";
+            std::cout<<"and adj tets for "<< v1<<": "<< v1.adjacentTets().size() <<" .and for "<< v2 <<": "<< v2.adjacentTets().size() << "\n";
             
-            std::cout<<"and adj tets for e: " << e.adjTets.size() << "\n";
-            for (Tet t:neigh_tets){
-                std::cout<<t.getIndex()<<" ";
+            std::cout<<"and adj tets for e: " << e.adjacentTets().size() << "\n";
+            for (Tet t: e.adjacentTets()){
+                std::cout<<t<<" ";
             }
+            std::cout<<"\n";
+            std::cout<<"and adj tets for v1: " << v1.adjacentTets().size() << "\n";
+            for (Tet t: v1.adjacentTets()){
+                std::cout<<t<<" ";
+            }
+            std::cout<<"\n";
             std::cout<<std::endl;
+        }
+        size_t f_ind = 0;
+        for(std::vector<size_t> f_t_inds: tet_mesh->fAdjTs){
+            std::cout<< "* at face ind "<< f_ind++ <<"\n    ";
+            for(size_t t_ind: f_t_inds){
+                std::cout<< t_ind<<" ";
+            }
+            std::cout<<"\n";
         }
 
     }
