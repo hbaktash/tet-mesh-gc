@@ -51,11 +51,16 @@ double normal_curves_graph_radius;
 
 int face_ind = 0;
 float raise_size = 1.;
+
 /*
  * Show selected edge.
  * This function gets called every time an element is selected on-screen.
  */
 void showSelected() {}
+
+void showEdge(Vertex v1, Vertex v2) {
+
+}
 
 void redraw() {
     showSelected();
@@ -67,7 +72,7 @@ Vertex buildTetOnFace(Face f, TetMesh &mesh, VertexPositionGeometry &geometry){
     Halfedge fHe = f.halfedge();
     Vertex v1 = fHe.tailVertex(), v2 = fHe.tipVertex(), v3 = fHe.next().tipVertex();
     Vertex v = mesh.buildVolOnFace(f);
-    printf("a Tet was updated with vertex %d\n",v.getIndex());
+    std::cout<<"compressed.\n";
     mesh.compress(); // otherwise vector size is doubles and we get lots of meaningless indices
     mesh.compressTets();
     std::cout<<"compressed.\n";
@@ -93,7 +98,7 @@ void functionCallback() {
                            " nFaces: " + std::to_string(tet_mesh->nFaces()) + 
                            " nTets: " + std::to_string(tet_mesh->nTets()));
     }
-    ImGui::SliderInt("Face index", &face_ind, 0, tet_mesh->nFaces());
+    ImGui::SliderInt("Face index", &face_ind, 0, tet_mesh->nFaces()-1);
     ImGui::SliderFloat("raise magnitude", &raise_size, -10., 10.);
     
     if (ImGui::Button("raise face")) {
@@ -116,7 +121,7 @@ void functionCallback() {
                 std::cout<< geometry->vertexPositions[v]<<"\n";
             }
             printf("geo locs %d tet neigh counts %d\n", geometry->inputVertexPositions.size(), tet_mesh->tAdjVs.size());
-            psTetMesh = polyscope::registerTetMesh("new tet mesh", geometry->inputVertexPositions, tet_mesh->tAdjVs);
+            psTetMesh = polyscope::registerTetMesh(MESHNAME, geometry->inputVertexPositions, tet_mesh->tAdjVs);
             redraw();
         }
     }    
