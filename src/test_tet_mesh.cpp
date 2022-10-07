@@ -72,6 +72,7 @@ Vertex buildTetOnFace(Face f, TetMesh &mesh, VertexPositionGeometry &geometry){
     Halfedge fHe = f.halfedge();
     Vertex v1 = fHe.tailVertex(), v2 = fHe.tipVertex(), v3 = fHe.next().tipVertex();
     Vertex v = mesh.buildVolOnFace(f);
+    mesh.validateConnectivity();
     std::cout<<"compressed.\n";
     mesh.compress(); // otherwise vector size is doubles and we get lots of meaningless indices
     mesh.compressTets();
@@ -99,6 +100,7 @@ Vertex splitTet(Tet t, TetMesh &mesh, VertexPositionGeometry &geometry){
     baryCenter = baryCenter/4.;
 
     Vertex v = tet_mesh->splitTet(t);
+    tet_mesh->validateConnectivity();
     std::cout<<"compressing..\n";
     mesh.compress(); // otherwise vector size is doubles and we get lots of meaningless indices?
     mesh.compressTets();
@@ -134,18 +136,11 @@ void functionCallback() {
             Vertex new_v = buildTetOnFace(f, *tet_mesh, *geometry);
             printf("the new vertex is %d\n", new_v.getIndex());
             polyscope::removeVolumeMesh(MESHNAME);
-            std::cout<<"final check\n";
-            for(std::vector<size_t> verts: tet_mesh->tAdjVs){
-                for(size_t vind: verts){
-                    std::cout<< " "<< vind;
-                }
-                std::cout<<"\n";
-            }
             geometry->requireVertexPositions();
             for(Vertex v: tet_mesh->vertices()){
                 std::cout<< geometry->vertexPositions[v]<<"\n";
             }
-            printf("geo locs %d tet neigh counts %d\n", geometry->inputVertexPositions.size(), tet_mesh->tAdjVs.size());
+            // printf("geo locs %d tet neigh counts %d\n", geometry->inputVertexPositions.size(), tet_mesh->tAdjVs.size());
             psTetMesh = polyscope::registerTetMesh(MESHNAME, geometry->inputVertexPositions, tet_mesh->tAdjVs);
             redraw();
         }
@@ -158,17 +153,7 @@ void functionCallback() {
         Vertex new_v = splitTet(t, *tet_mesh, *geometry);
         printf("the new vertex is %d\n", new_v.getIndex());
         polyscope::removeVolumeMesh(MESHNAME);
-        std::cout<<"final check\n";
-        for(std::vector<size_t> verts: tet_mesh->tAdjVs){
-            for(size_t vind: verts){
-                std::cout<< " "<< vind;
-            }
-            std::cout<<"\n";
-        }
         geometry->requireVertexPositions();
-        // for(Vertex v: tet_mesh->vertices()){
-        //     std::cout<< geometry->vertexPositions[v]<<"\n";
-        // }
         printf("geo locs %d tet neigh counts %d\n", geometry->inputVertexPositions.size(), tet_mesh->tAdjVs.size());
         psTetMesh = polyscope::registerTetMesh(MESHNAME, geometry->inputVertexPositions, tet_mesh->tAdjVs);
         redraw();
@@ -247,6 +232,9 @@ int main(int argc, char** argv) {
     tet_mesh = tet_mesh_uptr.release();
     geometry = geometry_uptr.release();
 
+    std::cout<<"initial validating connectivity\n ";
+    tet_mesh->validateConnectivity();
+    
     std::cout<<"tet_cnt " << simple_greedy_tet_mesh.nFaces() << " geo cnt " << simple_greedy_tet_mesh.vertexCoordinates.size()<<std::endl;
     // geometry->normalize(Vector3::constant(0.), true);
     
