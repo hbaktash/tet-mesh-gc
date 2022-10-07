@@ -49,7 +49,7 @@ polyscope::SurfaceGraphQuantity* normal_curves;
 double selected_edge_radius;
 double normal_curves_graph_radius;
 
-int face_ind = 0;
+int face_ind = 0, tet_ind = 0;
 float raise_size = 1.;
 
 /*
@@ -91,6 +91,31 @@ Vertex buildTetOnFace(Face f, TetMesh &mesh, VertexPositionGeometry &geometry){
 }
 
 
+Vertex splitTet(Tet t, TetMesh &mesh, VertexPositionGeometry &geometry){
+    Vector3 baryCenter = {0., 0., 0.};
+    for(Vertex v: t.adjVertices()){
+        baryCenter += geometry.inputVertexPositions[v];
+    }
+    baryCenter = baryCenter/4.;
+
+    Vertex v = tet_mesh->splitTet(t);
+    std::cout<<"compressing..\n";
+    mesh.compress(); // otherwise vector size is doubles and we get lots of meaningless indices?
+    mesh.compressTets();
+    std::cout<<"compressed.\n";
+    VertexData<Vector3> newPositions(mesh);
+    for(Vertex vv: mesh.vertices()){
+        if(vv.getIndex() != v.getIndex()){
+            newPositions[vv] = geometry.inputVertexPositions[vv];
+        }
+    }
+    newPositions[v] = baryCenter;
+    geometry.inputVertexPositions = newPositions;
+    geometry.refreshQuantities();
+    return v;
+}
+
+
 void functionCallback() {
     if (ImGui::Button("some info")) {
         polyscope::warning(" nEdges: " + std::to_string(tet_mesh->nEdges()) + 
@@ -124,6 +149,29 @@ void functionCallback() {
             psTetMesh = polyscope::registerTetMesh(MESHNAME, geometry->inputVertexPositions, tet_mesh->tAdjVs);
             redraw();
         }
+    }
+    ImGui::SliderInt("Tet index", &tet_ind, 0, tet_mesh->nTets()-1);
+    if (ImGui::Button("Split Tet")) {
+        Tet t = tet_mesh->tet(tet_ind);
+        printf(" tet %d chosen\n", t.getIndex());
+        
+        Vertex new_v = splitTet(t, *tet_mesh, *geometry);
+        printf("the new vertex is %d\n", new_v.getIndex());
+        polyscope::removeVolumeMesh(MESHNAME);
+        std::cout<<"final check\n";
+        for(std::vector<size_t> verts: tet_mesh->tAdjVs){
+            for(size_t vind: verts){
+                std::cout<< " "<< vind;
+            }
+            std::cout<<"\n";
+        }
+        geometry->requireVertexPositions();
+        // for(Vertex v: tet_mesh->vertices()){
+        //     std::cout<< geometry->vertexPositions[v]<<"\n";
+        // }
+        printf("geo locs %d tet neigh counts %d\n", geometry->inputVertexPositions.size(), tet_mesh->tAdjVs.size());
+        psTetMesh = polyscope::registerTetMesh(MESHNAME, geometry->inputVertexPositions, tet_mesh->tAdjVs);
+        redraw();
     }    
 }
 
