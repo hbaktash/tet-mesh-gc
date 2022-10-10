@@ -130,16 +130,15 @@ void functionCallback() {
     
     if (ImGui::Button("raise face")) {
         Face f = tet_mesh->face(face_ind);
-        printf(" face %d chosen\n", f.getIndex());
         if(f.isDead()) polyscope::warning(" face with index " + std::to_string(face_ind) + " is dead ", " ");
         else{
             Vertex new_v = buildTetOnFace(f, *tet_mesh, *geometry);
-            printf("the new vertex is %d\n", new_v.getIndex());
             polyscope::removeVolumeMesh(MESHNAME);
             geometry->requireVertexPositions();
-            for(Vertex v: tet_mesh->vertices()){
-                std::cout<< geometry->vertexPositions[v]<<"\n";
-            }
+            // printf("the new vertex is %d\n", new_v.getIndex());
+            // for(Vertex v: tet_mesh->vertices()){
+            //     std::cout<< geometry->vertexPositions[v]<<"\n";
+            // }
             // printf("geo locs %d tet neigh counts %d\n", geometry->inputVertexPositions.size(), tet_mesh->tAdjVs.size());
             psTetMesh = polyscope::registerTetMesh(MESHNAME, geometry->inputVertexPositions, tet_mesh->tAdjVs);
             redraw();
