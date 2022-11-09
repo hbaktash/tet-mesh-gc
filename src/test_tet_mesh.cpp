@@ -246,7 +246,7 @@ int main(int argc, char** argv) {
     //                                         polyscopePermutations(*tet_mesh));
     MESHNAME = "tet mesh";
     psTetMesh = polyscope::registerTetMesh(MESHNAME, geometry->inputVertexPositions, tet_mesh->tAdjVs);
-    std::cout<<"tets count " << tet_mesh->tet_objects.size() << std::endl;
+    std::cout<<"tets count " << tet_mesh->nTets() << std::endl;
     // psMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
     // Give control to the polyscope gui
     polyscope::show();
