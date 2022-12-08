@@ -38,17 +38,6 @@ polyscope::SurfaceMesh* psMesh;
 polyscope::VolumeMesh* psTetMesh;
 std::string MESHNAME;
 
-
-// Some global variables
-Vector<double> DELTA;                      // sources
-polyscope::SurfaceGraphQuantity* currEdge; // currently active vertex
-polyscope::SurfaceEdgeScalarQuantity* surface_edge_ints;
-
-polyscope::SurfaceGraphQuantity* normal_curves;
-// double maxPhi = 0.0;
-double selected_edge_radius;
-double normal_curves_graph_radius;
-
 int face_ind = 0, tet_ind = 0;
 float raise_size = 1.;
 

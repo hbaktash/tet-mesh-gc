@@ -72,9 +72,22 @@ set(SRCS_TEST_TET_MESH
   utils/src/colormap.cpp
 )
 
+set(SRCS_TEST_TET_MESH_TILING
+  src/test_tet_tiling.cpp
+  src/tet_tiling.cpp
+  utils/src/colormap.cpp
+)
+
 # executable configs
 add_executable(test_tet_mesh  "${SRCS_TEST_TET_MESH}")
 target_include_directories(test_tet_mesh PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 target_include_directories(test_tet_mesh PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/utils/include")
 target_include_directories(test_tet_mesh PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/deps/polyscope/deps/args")
 target_link_libraries(test_tet_mesh geometry-central polyscope)
+
+# executable configs
+add_executable(test_tet_mesh_tiling  "${SRCS_TEST_TET_MESH_TILING}")
+target_include_directories(test_tet_mesh_tiling PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+target_include_directories(test_tet_mesh_tiling PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/utils/include")
+target_include_directories(test_tet_mesh_tiling PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/deps/polyscope/deps/args")
+target_link_libraries(test_tet_mesh_tiling geometry-central polyscope)
