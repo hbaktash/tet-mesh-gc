@@ -29,16 +29,23 @@ VertexPositionGeometry* tet_geometry;
 // Polyscope visualization handle, to quickly add data to the surface
 int N = 2;
 polyscope::SurfaceMesh* psMesh;
+polyscope::SurfaceMesh* psTetSkeletonMesh;
 polyscope::VolumeMesh* psTetMesh;
 std::string MESHNAME;
 
 int face_ind = 0, tet_ind = 0, edge_ind = 0;
 float raise_size = 1.;
 
-/*
- * Show selected edge.
- * This function gets called every time an element is selected on-screen.
- */
+
+void redraw_hosting_tet_mesh(){
+    if (polyscope::hasSurfaceMesh(MESHNAME)) polyscope::removeSurfaceMesh(MESHNAME);
+    psTetSkeletonMesh = polyscope::registerSurfaceMesh(MESHNAME, tet_geometry->inputVertexPositions, tet_mesh->getFaceVertexList(),
+                                        polyscopePermutations(*tet_mesh));
+    psTetSkeletonMesh->setTransparency(0.3);
+    psTetSkeletonMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
+}
+
+
 void showSelected() {}
 
 void showEdge(Vertex v1, Vertex v2) {
@@ -141,13 +148,7 @@ void functionCallback() {
             Vertex new_v = buildTetOnFace(f, *tet_mesh, *tet_geometry);
             polyscope::removeVolumeMesh(MESHNAME);
             tet_geometry->requireVertexPositions();
-            // printf("the new vertex is %d\n", new_v.getIndex());
-            // for(Vertex v: tet_mesh->vertices()){
-            //     std::cout<< geometry->vertexPositions[v]<<"\n";
-            // }
-            // printf("geo locs %d tet neigh counts %d\n", geometry->inputVertexPositions.size(), tet_mesh->tAdjVs.size());
-            psTetMesh = polyscope::registerTetMesh(MESHNAME, tet_geometry->inputVertexPositions, tet_mesh->tAdjVs);
-            redraw();
+            redraw_hosting_tet_mesh();
         }
     }
     ImGui::SliderInt("Tet index", &tet_ind, 0, tet_mesh->nTets()-1);
@@ -159,9 +160,7 @@ void functionCallback() {
         printf("the new vertex is %d\n", new_v.getIndex());
         polyscope::removeVolumeMesh(MESHNAME);
         tet_geometry->requireVertexPositions();
-        printf("geo locs %d tet neigh counts %d\n", tet_geometry->inputVertexPositions.size(), tet_mesh->tAdjVs.size());
-        psTetMesh = polyscope::registerTetMesh(MESHNAME, tet_geometry->inputVertexPositions, tet_mesh->tAdjVs);
-        redraw();
+        redraw_hosting_tet_mesh();
     }
     ImGui::SliderInt("Edge index", &edge_ind, 0, tet_mesh->nEdges()-1);
     if (ImGui::Button("Split Edge")) {
@@ -172,9 +171,7 @@ void functionCallback() {
         printf("the new vertex is %d\n", new_v.getIndex());
         polyscope::removeVolumeMesh(MESHNAME);
         tet_geometry->requireVertexPositions();
-        printf("geo locs %d tet neigh counts %d\n", tet_geometry->inputVertexPositions.size(), tet_mesh->tAdjVs.size());
-        psTetMesh = polyscope::registerTetMesh(MESHNAME, tet_geometry->inputVertexPositions, tet_mesh->tAdjVs);
-        redraw();
+        redraw_hosting_tet_mesh();
     }
 }
 
@@ -264,7 +261,7 @@ int main(int argc, char** argv) {
     // psMesh = polyscope::registerSurfaceMesh("dummy tet", geometry->inputVertexPositions, tet_mesh->getFaceVertexList(),
     //                                         polyscopePermutations(*tet_mesh));
     MESHNAME = "tet mesh";
-    psTetMesh = polyscope::registerTetMesh(MESHNAME, tet_geometry->inputVertexPositions, tet_mesh->tAdjVs);
+    redraw_hosting_tet_mesh();
     std::cout<<"tets count " << tet_mesh->nTets() << std::endl;
     // psMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
     // Give control to the polyscope gui
