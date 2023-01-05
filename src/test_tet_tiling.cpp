@@ -119,6 +119,29 @@ Vertex splitTet(Tet t, TetMesh &mesh, VertexPositionGeometry &geometry){
     return v;
 }
 
+
+Vertex splitEdge(Edge e, TetMesh &mesh, VertexPositionGeometry &geometry){
+    Vector3 baryCenter = {0., 0., 0.};
+    baryCenter += (geometry.inputVertexPositions[e.firstVertex()] + geometry.inputVertexPositions[e.secondVertex()])/2.;
+    
+    Vertex v = tet_mesh->splitEdge(e);
+    tet_mesh->validateConnectivity();
+    std::cout<<"compressing..\n";
+    mesh.compress(); // otherwise? vector size is doubles and we get lots of meaningless indices?
+    mesh.compressTets();
+    std::cout<<"compressed.\n";
+    VertexData<Vector3> newPositions(mesh);
+    for(Vertex vv: mesh.vertices()){
+        if(vv.getIndex() != v.getIndex()){
+            newPositions[vv] = geometry.inputVertexPositions[vv];
+        }
+    }
+    newPositions[v] = baryCenter;
+    geometry.inputVertexPositions = newPositions;
+    geometry.refreshQuantities();
+    return v;
+}
+
 void functionCallback() {
     if (ImGui::Button("some info")) {
         polyscope::warning(" nEdges " + std::to_string(tet_mesh->nEdges()) + 
@@ -154,19 +177,16 @@ void functionCallback() {
         tet_mesh->order_all_siblings();
         tet_mesh->validateConnectivity();
     }
-    // ImGui::SliderInt("Edge index", &edge_ind, 0, tet_mesh->nEdges()-1);
-    // if (ImGui::Button("Split Edge")) {
-    //     Edge e = tet_mesh->edge(edge_ind);
-    //     printf(" tet %d chosen\n", e.getIndex());
+    ImGui::SliderInt("Edge index", &edge_ind, 0, tet_mesh->nEdges()-1);
+    if (ImGui::Button("Split Edge")) {
+        Edge e = tet_mesh->edge(edge_ind);
+        printf(" Edge %d chosen\n", e.getIndex());
         
-    //     Vertex new_v = splitEdge(e, *tet_mesh, *tet_geometry);
-    //     printf("the new vertex is %d\n", new_v.getIndex());
-    //     polyscope::removeVolumeMesh(MESHNAME);
-    //     tet_geometry->requireVertexPositions();
-    //     printf("geo locs %d tet neigh counts %d\n", tet_geometry->inputVertexPositions.size(), tet_mesh->tAdjVs.size());
-    //     psTetMesh = polyscope::registerTetMesh(MESHNAME, tet_geometry->inputVertexPositions, tet_mesh->tAdjVs);
-    //     redraw();
-    // }
+        Vertex new_v = splitEdge(e, *tet_mesh, *tet_geometry);
+        printf("the new vertex is %d\n", new_v.getIndex());
+        tet_geometry->requireVertexPositions();
+        redraw_hosting_tet_mesh();
+    }
 }
 
 

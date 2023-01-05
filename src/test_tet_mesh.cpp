@@ -146,7 +146,6 @@ void functionCallback() {
         if(f.isDead()) polyscope::warning(" face with index " + std::to_string(face_ind) + " is dead ", " ");
         else{
             Vertex new_v = buildTetOnFace(f, *tet_mesh, *tet_geometry);
-            polyscope::removeVolumeMesh(MESHNAME);
             tet_geometry->requireVertexPositions();
             redraw_hosting_tet_mesh();
         }
@@ -158,7 +157,6 @@ void functionCallback() {
         
         Vertex new_v = splitTet(t, *tet_mesh, *tet_geometry);
         printf("the new vertex is %d\n", new_v.getIndex());
-        polyscope::removeVolumeMesh(MESHNAME);
         tet_geometry->requireVertexPositions();
         redraw_hosting_tet_mesh();
     }
@@ -169,7 +167,6 @@ void functionCallback() {
         
         Vertex new_v = splitEdge(e, *tet_mesh, *tet_geometry);
         printf("the new vertex is %d\n", new_v.getIndex());
-        polyscope::removeVolumeMesh(MESHNAME);
         tet_geometry->requireVertexPositions();
         redraw_hosting_tet_mesh();
     }
@@ -263,46 +260,14 @@ int main(int argc, char** argv) {
     MESHNAME = "tet mesh";
     redraw_hosting_tet_mesh();
     std::cout<<"tets count " << tet_mesh->nTets() << std::endl;
+    tet_mesh->order_all_siblings();
+    tet_mesh->validateConnectivity();
     // psMesh->setBackFacePolicy(polyscope::BackFacePolicy::Identical);
     // Give control to the polyscope gui
     polyscope::show();
     
     std::string v1_str = "1", v2_str = "2";
-    /*
-    while (true){
-        std::cin>> v1_str >> v2_str;
-        if(v1_str == "f") break;
-        size_t v1_ind = std::stoi(v1_str), v2_ind = std::stoi(v2_str);
-        Vertex v1 = tet_mesh->vertex(v1_ind), v2 = tet_mesh->vertex(v2_ind);
-        Edge e = tet_mesh->connectingEdge(v1, v2);
-        if (e.getIndex() != geometrycentral::INVALID_IND){
-            std::cout<<"\n connecting e for "<<v1<<" "<<v2<<" is "<< e << "\n";
-            std::cout<<"and adj tets for "<< v1<<": "<< v1.adjacentTets().size() <<" .and for "<< v2 <<": "<< v2.adjacentTets().size() << "\n";
-            
-            std::cout<<"and adj tets for e: " << e.adjacentTets().size() << "\n";
-            for (Tet t: e.adjacentTets()){
-                std::cout<<t<<" ";
-            }
-            std::cout<<"\n";
-            std::cout<<"and adj tets for v1: " << v1.adjacentTets().size() << "\n";
-            for (Tet t: v1.adjacentTets()){
-                std::cout<<t<<" ";
-            }
-            std::cout<<"\n";
-            std::cout<<std::endl;
-        }
-        size_t f_ind = 0;
-        for(std::vector<size_t> f_t_inds: tet_mesh->fAdjTs){
-            std::cout<< "* at face ind "<< f_ind++ <<"\n    ";
-            for(size_t t_ind: f_t_inds){
-                std::cout<< t_ind<<" ";
-            }
-            std::cout<<"\n";
-        }
-
-    }
-    */   
-
+    
     delete tet_mesh;
     delete tet_geometry;
 
